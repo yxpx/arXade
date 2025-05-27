@@ -19,6 +19,9 @@ const playfairDisplay = Playfair_Display({
 export const metadata: Metadata = {
   title: "arXade",
   description: "Discover arXiv papers with AI-powered search and recommendations",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
