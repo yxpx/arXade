@@ -36,7 +36,7 @@ function ResultsContent() {
         <div className="max-w-7xl mx-auto grid grid-cols-3 items-center">
           {/* Left section */}
           <div className="flex items-center gap-4 justify-start">
-            <Link href="/" className="text-2xl font-bold font-[family-name:var(--font-playfair)] select-none">
+            <Link href="/" className="text-2xl font-bold font-[family-name:var(--font-playfair)] select-none cursor-pointer">
               arXade
             </Link>
           </div>
@@ -48,11 +48,11 @@ function ResultsContent() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-5 py-3 bg-transparent border border-gray-700 rounded-full focus:outline-none focus:border-gray-500 focus:shadow-[0_0_3px_rgba(255,255,255,0.1)] text-white"
+                className="w-full px-5 py-3 bg-transparent border border-gray-300 rounded-full focus:outline-none focus:shadow-[0_0_3px_rgba(255,255,255,0.1)] text-white"
               />
               <button 
                 type="submit"
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors cursor-pointer"
               >
                 <FiSearch className="w-4 h-4" />
               </button>
@@ -65,7 +65,7 @@ function ResultsContent() {
               href="https://github.com/yxpx/arXade" 
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-white hover:text-gray-300 transition-colors cursor-pointer"
             >
               <FaGithub className="w-5 h-5" />
             </Link>

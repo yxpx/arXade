@@ -33,11 +33,11 @@ export default function Home() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-6 py-4 bg-transparent border border-gray-800 rounded-full focus:outline-none focus:border-gray-600 focus:shadow-[0_0_5px_rgba(255,255,255,0.15)] text-white text-lg font-light transition-all duration-300"
+            className="w-full px-6 py-4 bg-transparent border border-gray-300 rounded-full focus:outline-none focus:shadow-[0_0_5px_rgba(255,255,255,0.15)] text-white text-lg font-light transition-all duration-300"
           />
           <button 
             type="submit"
-            className="absolute right-6 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+            className="absolute right-6 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 transition-colors cursor-pointer"
           >
             <FiSearch className="w-5 h-5" />
           </button>
@@ -50,7 +50,7 @@ export default function Home() {
           href="https://github.com/yxpx/arXade" 
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+          className="flex items-center gap-2 text-white hover:text-gray-300 transition-colors text-sm cursor-pointer"
         >
           <FaGithub className="w-4 h-4" />
           <span>View on GitHub</span>
