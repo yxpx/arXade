@@ -4,9 +4,9 @@ import { FaGithub } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 
-export default function Results() {
+function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -132,5 +132,22 @@ export default function Results() {
         )}
       </main>
     </div>
+  );
+}
+
+// Loading fallback component
+function ResultsLoading() {
+  return (
+    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="text-gray-400">Loading search results...</div>
+    </div>
+  );
+}
+
+export default function Results() {
+  return (
+    <Suspense fallback={<ResultsLoading />}>
+      <ResultsContent />
+    </Suspense>
   );
 } 
