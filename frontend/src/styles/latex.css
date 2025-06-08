@@ -1,0 +1,37 @@
+/* LaTeX styling for the app */
+
+/* Style for the KaTeX rendered equations */
+.katex {
+  font-size: 1.1em !important;
+  line-height: 1.5 !important;
+}
+
+/* Make LaTeX code stand out with a slight highlight */
+code {
+  background-color: rgba(68, 70, 84, 0.4);
+  border-radius: 4px;
+  padding: 0.1em 0.3em;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9em;
+  color: #86e1fc !important;
+}
+
+/* Make inline math formulas with $ look better */
+.math-inline {
+  color: #86e1fc;
+  font-family: 'KaTeX_Math', serif;
+}
+
+/* Make sure displayed math gets proper spacing */
+.math-display {
+  margin: 1em 0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+/* Adjust LaTeX display in the markdown content */
+.prose .math {
+  color: #86e1fc;
+  overflow-x: auto;
+  max-width: 100%;
+} 
