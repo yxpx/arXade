@@ -1,5 +1,13 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+
+data/api.py 
+data/arXade_final.jsonl 
+data/arXade.jsonl 
+data/connect.py 
+data/search.py
+data/vsearch.py
+
 # dependencies
 /frontend/node_modules
 /frontend/.pnp
@@ -32,6 +40,12 @@
 
 # env files (can opt-in for committing if needed)
 /frontend/.env*
+!frontend/.env.example
+
+# root env files
+.env
+.env.*
+!.env.example
 
 # vercel
 /frontend/.vercel
@@ -39,6 +53,31 @@
 # typescript
 /frontend/*.tsbuildinfo
 /frontend/next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# backend env
+/backend/.env*
+!/backend/.env.example
 
 #cursor
 .cursorrules
