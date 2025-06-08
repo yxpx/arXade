@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "../styles/latex.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -80,7 +81,14 @@
     filter: hue-rotate(240deg) saturate(1.2) brightness(1.1);
   }
   }
-}
+  --animate-shine: shine var(--duration) infinite linear;
+  @keyframes shine {
+  0% {
+    background-position: 0% 0%;}
+  50% {
+    background-position: 100% 100%;}
+  to {
+    background-position: 0% 0%;}}}
 
 :root {
   --radius: 0.625rem;
@@ -115,6 +123,7 @@
   --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
   --sidebar-border: oklch(0.929 0.013 255.508);
   --sidebar-ring: oklch(0.704 0.04 256.788);
+  --shine-z-index: auto;
 }
 
 .dark {
@@ -207,4 +216,44 @@ body {
 
 .animate-aurora {
   animation: aurora 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Add the shine animation as specified in the guide */
+@keyframes shine {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  to {
+    background-position: 0% 0%;
+  }
+}
+
+.animate-shine {
+  animation: shine var(--duration, 14s) infinite linear;
+}
+
+html, body {
+  background-color: #000;
+  color: #fff;
+}
+
+.glow-text-white {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.7), 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Fix for search input on mobile */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+@keyframes shine {
+  to {
+    background-position: calc(var(--x) * 2) calc(var(--y) * 2);
+  }
 }
