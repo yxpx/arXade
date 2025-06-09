@@ -41,29 +41,47 @@ export default function LatexRenderer({ content, className = "" }: LatexRenderer
           .replace(/\\oe/g, 'œ');
       };
 
-      // First, find all LaTeX formulas and store them with a placeholder
-      const formulas: string[] = [];
-      const withPlaceholders = content.replace(/\$([^$]+)\$/g, (match, formula) => {
+      // First, find all LaTeX formulas (both inline and block) and store them with placeholders
+      const formulas: Array<{content: string, isBlock: boolean}> = [];
+      
+      // Handle block math first ($$...$$) - including multi-line expressions
+      let processedContent = content.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
         const placeholder = `__LATEX_FORMULA_${formulas.length}__`;
-        formulas.push(formula);
+        formulas.push({content: formula.trim(), isBlock: true});
+        return placeholder;
+      });
+      
+      // Then handle inline math ($...$)
+      processedContent = processedContent.replace(/\$([^$]+)\$/g, (match, formula) => {
+        const placeholder = `__LATEX_FORMULA_${formulas.length}__`;
+        formulas.push({content: formula.trim(), isBlock: false});
         return placeholder;
       });
       
       // Apply special character replacements to the text outside formulas
-      const processedText = replaceSpecialChars(withPlaceholders);
+      const textProcessed = replaceSpecialChars(processedContent);
       
       // Now restore formulas with KaTeX rendering
-      const finalContent = processedText.replace(/__LATEX_FORMULA_(\d+)__/g, (_, index) => {
-        const formula = formulas[parseInt(index)];
+      const finalContent = textProcessed.replace(/__LATEX_FORMULA_(\d+)__/g, (_, index) => {
+        const formulaObj = formulas[parseInt(index)];
+        if (!formulaObj) return '';
+        
         try {
-          return katex.renderToString(formula, {
+          const rendered = katex.renderToString(formulaObj.content, {
             throwOnError: false,
             output: 'html',
-            displayMode: false
+            displayMode: formulaObj.isBlock
           });
+          
+          // Wrap block equations in a div for proper spacing
+          if (formulaObj.isBlock) {
+            return `<div class="math-block my-4 text-center overflow-x-auto">${rendered}</div>`;
+          } else {
+            return `<span class="math-inline">${rendered}</span>`;
+          }
         } catch (err) {
           console.error('KaTeX rendering error:', err);
-          return `$${formula}$`; // Return the original formula if rendering fails
+          return formulaObj.isBlock ? `$$${formulaObj.content}$$` : `$${formulaObj.content}$`;
         }
       });
       

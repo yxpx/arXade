@@ -12,6 +12,7 @@ import PieChart from "@/components/PieChart";
 import LineChart from "@/components/LineChart";
 import WordCloudChart from "@/components/WordCloud";
 import FilterModal from "@/components/FilterModal";
+import DeepResearchModal from "@/components/DeepResearchModal";
 import dynamic from "next/dynamic";
 
 // Dynamically import ParentSize to avoid SSR issues
@@ -45,6 +46,9 @@ function ResultsContent() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [filteredPapers, setFilteredPapers] = useState<SearchResult[]>([]);
+
+  // Deep Research Modal state
+  const [deepResearchOpen, setDeepResearchOpen] = useState(false);
 
   useEffect(() => {
     const query = searchParams.get('q') || '';
@@ -112,21 +116,129 @@ function ResultsContent() {
 
   // Generate data for pie chart - group by primary category
   const getCategoryData = () => {
-    if (!results || !results.length) return [];
+    if (!results || !results.length) {
+      console.log("No results available for categories");
+      return [];
+    }
     
+    // Define our priority categories - using both lowercase and uppercase versions
+    const priorityCategories = [
+      "cs.CV", "cs.cv", 
+      "cs.LG", "cs.lg", 
+      "cs.CL", "cs.cl", 
+      "cs.AI", "cs.ai", 
+      "cs.NE", "cs.ne", 
+      "cs.RO", "cs.ro"
+    ];
     const categoryCount: Record<string, number> = {};
     
-    results.forEach(paper => {
-      if (!paper.primary_category) return;
-      
-      const category = paper.primary_category;
-      categoryCount[category] = (categoryCount[category] || 0) + 1;
+    // Define our standard categories - using the exact case as they appear in arXiv
+    const standardCategories = ["cs.CV", "cs.LG", "cs.CL", "cs.AI", "cs.NE", "cs.RO"];
+    
+    // Initialize all categories with zero count
+    standardCategories.forEach(cat => {
+      categoryCount[cat] = 0;
     });
     
-    return Object.entries(categoryCount)
-      .map(([category, count]) => ({ category, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5); // Limit to top 5 categories
+    console.log("Processing categories for", results.length, "papers");
+    
+    // For debugging
+    if (results.length > 0) {
+      console.log("Sample paper categories:", results[0].categories);
+      console.log("Sample paper primary category:", results[0].primary_category);
+      console.log("Total papers retrieved:", results.length);
+    }
+    
+    // Count all papers in their respective categories - with a simpler approach
+    results.forEach(paper => {
+      // Get all categories from the paper
+      const paperCategories = [];
+      
+      // Add categories from the categories array
+      if (paper.categories && Array.isArray(paper.categories)) {
+        paperCategories.push(...paper.categories);
+      }
+      
+      // Add primary category if it exists and is not already in the array
+      if (paper.primary_category && !paperCategories.includes(paper.primary_category)) {
+        paperCategories.push(paper.primary_category);
+      }
+      
+      // Debug information
+      console.log(`Paper ${paper.id || paper.arxiv_id} categories:`, paperCategories);
+      
+      // Check if any of the paper's categories match our standard categories
+      let matched = false;
+      
+      // Check each standard category in order
+      for (const standardCat of standardCategories) {
+        // Look for an exact match (case-sensitive)
+        if (paperCategories.includes(standardCat)) {
+          categoryCount[standardCat] += 1;
+          console.log(`Paper categorized as ${standardCat} (exact match)`);
+          matched = true;
+          break; // Only count in the first matching category
+        }
+      }
+      
+      // If no exact match was found, try case-insensitive matching
+      if (!matched) {
+        for (const standardCat of standardCategories) {
+          const lowerStandardCat = standardCat.toLowerCase();
+          
+          // Check if any paper category matches this standard category (case-insensitive)
+          const matchFound = paperCategories.some(paperCat => 
+            paperCat.toLowerCase() === lowerStandardCat
+          );
+          
+          if (matchFound) {
+            categoryCount[standardCat] += 1;
+            console.log(`Paper categorized as ${standardCat} (case-insensitive match)`);
+            matched = true;
+            break; // Only count in the first matching category
+          }
+        }
+      }
+      
+      // If still no match, check if any paper category starts with our standard categories
+      if (!matched) {
+        for (const standardCat of standardCategories) {
+          const lowerStandardCat = standardCat.toLowerCase();
+          
+          // Check if any paper category starts with this standard category (case-insensitive)
+          const matchFound = paperCategories.some(paperCat => 
+            paperCat.toLowerCase().startsWith(lowerStandardCat)
+          );
+          
+          if (matchFound) {
+            categoryCount[standardCat] += 1;
+            console.log(`Paper categorized as ${standardCat} (prefix match)`);
+            matched = true;
+            break; // Only count in the first matching category
+          }
+        }
+      }
+      
+      // If still not matched after all attempts, don't add to "other" - all papers should match
+      if (!matched) {
+        console.log(`WARNING: Paper ${paper.id || paper.arxiv_id} could not be categorized:`, paperCategories);
+      }
+    });
+    
+    // Log the final categorization results
+    console.log("Final category counts:", categoryCount);
+    console.log("Total papers counted:", Object.values(categoryCount).reduce((a, b) => a + b, 0));
+    console.log("Expected total:", results.length);
+    
+    // Always return all 5 standard categories, even if count is 0
+    const result = standardCategories.map(category => ({
+      category,
+      count: categoryCount[category] || 0
+    }))
+    .sort((a, b) => b.count - a.count);
+    
+    console.log("Category data:", result);
+    return result;
   };
 
   // Generate data for line chart - group by year
@@ -153,44 +265,197 @@ function ResultsContent() {
       .sort((a, b) => a.year - b.year);
   };
 
+  // Handle word click in word cloud - trigger new search in new tab
+  const handleWordClick = (word: string) => {
+    // Open search in new tab
+    const newUrl = `/results?q=${encodeURIComponent(word)}`;
+    window.open(newUrl, '_blank');
+  };
+
   // Generate data for word cloud
   const getWordCloudData = () => {
     if (!results || !results.length) return [];
     
     const wordCount: Record<string, number> = {};
     
-    // Common words to exclude
+    // Comprehensive list of stop words to exclude
     const stopWords = new Set([
-      'the', 'and', 'to', 'of', 'a', 'in', 'is', 'that', 'it', 'with', 'as', 'for', 
-      'on', 'was', 'be', 'by', 'at', 'this', 'an', 'which', 'are', 'from', 'or', 'have', 'has',
-      'we', 'our', 'can', 'been', 'not', 'their', 'they', 'these', 'such', 'were', 'its'
+      // Extended comprehensive English stop words
+      'about', 'above', 'after', 'again', 'against', 'all', 'am', 'an', 'and', 'any', 'are', 
+      "aren't", 'as', 'at', 'be', 'because', 'been', 'before', 'being', 'below', 'between', 
+      'both', 'but', 'by', "can't", 'cannot', 'could', "couldn't", 'did', "didn't", 'do', 
+      'does', "doesn't", 'doing', "don't", 'down', 'during', 'each', 'few', 'for', 'from', 
+      'further', 'had', "hadn't", 'has', "hasn't", 'have', "haven't", 'having', 'he', "he'd", 
+      "he'll", "he's", 'her', 'here', "here's", 'hers', 'herself', 'him', 'himself', 'his', 
+      'how', "how's", 'i', "i'd", "i'll", "i'm", "i've", 'if', 'in', 'into', 'is', "isn't", 
+      'it', "it's", 'its', 'itself', "let's", 'me', 'more', 'most', "mustn't", 'my', 'myself', 
+      'no', 'nor', 'not', 'of', 'off', 'on', 'once', 'only', 'or', 'other', 'ought', 'our', 
+      'ours', 'ourselves', 'out', 'over', 'own', 'same', "shan't", 'she', "she'd", "she'll", 
+      "she's", 'should', "shouldn't", 'so', 'some', 'such', 'than', 'that', "that's", 'the', 
+      'their', 'theirs', 'them', 'themselves', 'then', 'there', "there's", 'these', 'they', 
+      "they'd", "they'll", "they're", "they've", 'this', 'those', 'through', 'to', 'too', 
+      'under', 'until', 'up', 'very', 'was', "wasn't", 'we', "we'd", "we'll", "we're", 
+      "we've", 'were', "weren't", 'what', "what's", 'when', "when's", 'where', "where's", 
+      'which', 'while', 'who', "who's", 'whom', 'why', "why's", 'with', "won't", 'would', 
+      "wouldn't", 'you', "you'd", "you'll", "you're", "you've", 'your', 'yours', 'yourself', 
+      'yourselves',
+      // Additional common words that were in the original list
+      'also', 'each', 'may', 'might', 'must', 'shall', 'now', 'mine', 'theirs', 'onto', 
+      'among', 'within', 'without', 'since', 'although', 'though', 'however', 'therefore', 
+      'thus', 'hence', 'moreover', 'furthermore', 'nevertheless', 'nonetheless', 'otherwise',
+      // Academic filler words
+      'paper', 'study', 'research', 'approach', 'method', 'technique', 'analysis', 'work',
+      'show', 'shows', 'shown', 'demonstrate', 'demonstrates', 'demonstrated', 'present',
+      'presents', 'presented', 'propose', 'proposes', 'proposed', 'introduce', 'introduces',
+      'introduced', 'describe', 'describes', 'described', 'discuss', 'discusses', 'discussed',
+      'investigate', 'investigates', 'investigated', 'examine', 'examines', 'examined',
+      'evaluate', 'evaluates', 'evaluated', 'consider', 'considers', 'considered',
+      'develop', 'develops', 'developed', 'provide', 'provides', 'provided', 'obtain',
+      'obtains', 'obtained', 'achieve', 'achieves', 'achieved', 'result', 'results',
+      'conclusion', 'conclusions', 'finding', 'findings', 'observation', 'observations',
+      'experimental', 'experiments', 'experiment', 'dataset', 'datasets', 'baseline',
+      'baselines', 'benchmark', 'benchmarks', 'evaluation', 'evaluations', 'comparison',
+      'comparisons', 'performance', 'effectiveness', 'efficiency', 'improvement',
+      'improvements', 'enhancement', 'enhancements'
+    ]);
+    
+    // Technical terms we want to prioritize
+    const technicalTerms = new Set([
+      'neural', 'network', 'networks', 'deep', 'learning', 'machine', 'algorithm', 'algorithms',
+      'model', 'models', 'training', 'optimization', 'gradient', 'attention', 'transformer',
+      'convolution', 'convolutional', 'recurrent', 'lstm', 'gru', 'bert', 'gpt', 'encoder',
+      'decoder', 'classification', 'regression', 'clustering', 'supervised', 'unsupervised',
+      'reinforcement', 'data', 'feature', 'features', 'embedding', 'embeddings', 'vector',
+      'vectors', 'matrix', 'tensor', 'architecture', 'framework', 'loss', 'function',
+      'activation', 'layer', 'layers', 'parameter', 'parameters', 'weight', 'weights',
+      'bias', 'regularization', 'dropout', 'batch', 'normalization', 'backpropagation',
+      'inference', 'prediction', 'accuracy', 'precision', 'recall', 'score', 'metric',
+      'metrics', 'computational', 'complexity', 'scalability', 'robustness', 'generalization'
     ]);
     
     results.forEach(paper => {
       if (!paper.abstract) return;
       
-      const words = paper.abstract
-        .toLowerCase()
-        .replace(/[^\w\s]/g, '')
-        .split(/\s+/)
-        .filter(word => word.length > 3 && !stopWords.has(word));
+      // Extract both individual words and bigrams (two-word phrases)
+      const text = paper.abstract.toLowerCase();
       
+      // Clean and split into words
+      const words = text
+        .replace(/[^\w\s-]/g, ' ') // Keep hyphens for compound terms
+        .split(/\s+/)
+        .filter(word => word.length > 2);
+      
+      // Process individual words
       words.forEach(word => {
-        wordCount[word] = (wordCount[word] || 0) + 1;
+        // Clean word
+        const cleanWord = word.replace(/^[-]+|[-]+$/g, ''); // Remove leading/trailing hyphens
+        
+        if (cleanWord.length > 3 && !stopWords.has(cleanWord)) {
+          // Give extra weight to technical terms
+          const weight = technicalTerms.has(cleanWord) ? 2 : 1;
+          wordCount[cleanWord] = (wordCount[cleanWord] || 0) + weight;
+        }
       });
+      
+      // Process bigrams (two-word phrases) for better context
+      for (let i = 0; i < words.length - 1; i++) {
+        const word1 = words[i].replace(/^[-]+|[-]+$/g, '');
+        const word2 = words[i + 1].replace(/^[-]+|[-]+$/g, '');
+        
+        if (word1.length > 2 && word2.length > 2 && 
+            !stopWords.has(word1) && !stopWords.has(word2)) {
+          const bigram = `${word1} ${word2}`;
+          
+          // Only include bigrams that contain at least one technical term
+          if (technicalTerms.has(word1) || technicalTerms.has(word2)) {
+            wordCount[bigram] = (wordCount[bigram] || 0) + 1;
+          }
+        }
+      }
+      
+      // Also include paper title words with higher weight
+      if (paper.title) {
+        const titleWords = paper.title
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, ' ')
+          .split(/\s+/)
+          .filter(word => word.length > 3 && !stopWords.has(word));
+        
+        titleWords.forEach(word => {
+          const cleanWord = word.replace(/^[-]+|[-]+$/g, '');
+          if (cleanWord.length > 3 && !stopWords.has(cleanWord)) {
+            wordCount[cleanWord] = (wordCount[cleanWord] || 0) + 3; // Higher weight for title words
+          }
+        });
+      }
     });
     
+    // Filter and sort results
     return Object.entries(wordCount)
+      .filter(([text, value]) => value >= 2) // Only include terms that appear at least twice
       .map(([text, value]) => ({ text, value }))
       .sort((a, b) => b.value - a.value)
-      .slice(0, 100); // Limit to top 100 words
+      .slice(0, 80); // Increased from 50 to 80 words
   };
 
   // Handle category click in pie chart
   const handleCategoryClick = (category: string) => {
-    const filtered = results.filter(paper => paper.primary_category === category);
+    console.log("Category clicked:", category);
+    
+    if (!category) {
+      console.error("No category provided to handleCategoryClick");
+      return;
+    }
+    
+    // Filter papers that have this category either as primary or in their categories array
+    const filtered = results.filter(paper => {
+      // Get all categories from the paper
+      const paperCategories = [];
+      
+      // Add categories from the categories array
+      if (paper.categories && Array.isArray(paper.categories)) {
+        paperCategories.push(...paper.categories);
+      }
+      
+      // Add primary category if it exists and is not already in the array
+      if (paper.primary_category && !paperCategories.includes(paper.primary_category)) {
+        paperCategories.push(paper.primary_category);
+      }
+      
+      // Check for exact match first
+      if (paperCategories.includes(category)) {
+        return true;
+      }
+      
+      // Then try case-insensitive match
+      const lowerCategory = category.toLowerCase();
+      if (paperCategories.some(cat => cat.toLowerCase() === lowerCategory)) {
+        return true;
+      }
+      
+      // Finally try prefix match
+      if (paperCategories.some(cat => cat.toLowerCase().startsWith(lowerCategory))) {
+        return true;
+      }
+      
+      return false;
+    });
+    
+    console.log(`Found ${filtered.length} papers in category ${category}`);
+    
+    // Get the proper label for this category
+    const categoryLabel = {
+      "cs.CV": "Computer Vision",
+      "cs.LG": "Machine Learning",
+      "cs.CL": "Computation & Language",
+      "cs.AI": "Artificial Intelligence",
+      "cs.NE": "Neural & Evolutionary",
+      "cs.RO": "Robotics"
+    }[category] || category;
+    
+    // Always show the filtered papers, even if empty
     setFilteredPapers(filtered);
-    setModalTitle(`Papers in ${category}`);
+    setModalTitle(`${filtered.length} Papers in ${categoryLabel}`);
     setModalOpen(true);
   };
 
@@ -207,6 +472,10 @@ function ResultsContent() {
     setFilteredPapers(filtered);
     setModalTitle(`Papers from ${year}`);
     setModalOpen(true);
+  };
+
+  const handleDeepResearchClick = () => {
+    setDeepResearchOpen(true);
   };
 
   return (
@@ -283,6 +552,8 @@ function ResultsContent() {
                 summary={summary}
                 isLoading={summaryLoading}
                 error={summaryError}
+                papers={results}
+                onDeepResearchClick={handleDeepResearchClick}
               />
               
               {/* Paper List */}
@@ -307,6 +578,7 @@ function ResultsContent() {
                 <WordCloudChart 
                   words={getWordCloudData()} 
                   title="Common Terms in Abstracts"
+                  onWordClick={handleWordClick}
                 />
               </div>
             </div>
@@ -322,6 +594,14 @@ function ResultsContent() {
       >
         <PaperCarousel papers={filteredPapers} title={modalTitle} />
       </FilterModal>
+
+      {/* Deep Research Modal */}
+      <DeepResearchModal
+        isOpen={deepResearchOpen}
+        onClose={() => setDeepResearchOpen(false)}
+        query={searchParams.get('q') || ''}
+        papers={results}
+      />
     </div>
   );
 }

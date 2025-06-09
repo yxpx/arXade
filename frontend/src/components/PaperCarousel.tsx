@@ -104,8 +104,8 @@ export default function PaperCarousel({ papers, title = "Relevant Papers" }: Pap
 
   return (
     <ShineCard className="h-[500px] flex flex-col">
-      <div className="flex justify-between items-center mb-4">
-        <Title className="text-white">{title}</Title>
+      <div className="flex justify-between items-center mb-2">
+        <div className="text-white text-xl font-semibold">{title}</div>
         <div className="text-gray-400 text-sm">
           {papers.length > 0 ? `${currentPage * papersPerPage + 1}-${Math.min((currentPage + 1) * papersPerPage, papers.length)} of ${papers.length}` : '0 papers'}
         </div>

@@ -34,6 +34,7 @@ export default function Home() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full px-6 py-4 bg-transparent border border-gray-300 rounded-full focus:outline-none focus:shadow-[0_0_5px_rgba(255,255,255,0.15)] text-white text-lg font-light transition-all duration-300"
+            placeholder="Search arXiv papers..."
           />
           <button 
             type="submit"

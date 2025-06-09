@@ -4,6 +4,7 @@
 .katex {
   font-size: 1.1em !important;
   line-height: 1.5 !important;
+  color: #e2e8f0 !important;
 }
 
 /* Make LaTeX code stand out with a slight highlight */
@@ -18,11 +19,28 @@ code {
 
 /* Make inline math formulas with $ look better */
 .math-inline {
-  color: #86e1fc;
+  color: #86e1fc !important;
   font-family: 'KaTeX_Math', serif;
+  display: inline;
+}
+
+.math-inline .katex {
+  color: #86e1fc !important;
 }
 
 /* Make sure displayed math gets proper spacing */
+.math-block {
+  margin: 1.5em 0;
+  overflow-x: auto;
+  text-align: center;
+  display: block;
+}
+
+.math-block .katex {
+  color: #86e1fc !important;
+  font-size: 1.2em !important;
+}
+
 .math-display {
   margin: 1em 0;
   overflow-x: auto;
@@ -34,4 +52,14 @@ code {
   color: #86e1fc;
   overflow-x: auto;
   max-width: 100%;
+}
+
+/* Ensure KaTeX elements are properly styled in dark mode */
+.katex-display {
+  margin: 1em 0 !important;
+  text-align: center !important;
+}
+
+.katex-display .katex {
+  color: #86e1fc !important;
 } 

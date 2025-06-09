@@ -57,7 +57,7 @@ app.add_middleware(
 
 class SearchQuery(BaseModel):
     query: str
-    limit: int = 36
+    limit: int = 50
 
 def create_int8_embedding(float_embedding: List[float]) -> List[int]:
     """Quantizes a float embedding vector to int8."""
@@ -115,7 +115,7 @@ async def search_papers(search_query: SearchQuery):
                     'index': 'vector_index', 
                     'path': 'embedding_int8', 
                     'queryVector': query_embedding, 
-                    'numCandidates': 200, 
+                    'numCandidates': 500, 
                     'limit': search_query.limit
                 }
             },
@@ -255,13 +255,13 @@ Topic: {search_query.query}
 Based on the query and the papers above (if available), provide a concise summary about {search_query.query} in 2-3 well-structured paragraphs.
 Cover the core concepts, key developments, and important applications.
 
-Format your response with minimal Markdown:
-- Use **bold** for important terms and concepts
-- Use *italics* for emphasis
+Format your response as plain text with no markdown formatting:
+- Do NOT use **bold** or *italics*
 - Use standard LaTeX notation for mathematical formulas (e.g., $E=mc^2$ or $\\nabla \\cdot \\vec{{F}} = 0$)
-- Do NOT use headings, lists, or other complex formatting
+- Write in flowing paragraphs without special formatting
+- Mathematical expressions should flow inline with the text
 
-Keep your response between 1500 characters. Use academic but accessible language.
+Keep your response between 1300 characters. Use academic but accessible language.
 """
         
         contents = [
@@ -274,7 +274,7 @@ Keep your response between 1500 characters. Use academic but accessible language
         # Set up the generation config
         generate_content_config = types.GenerateContentConfig(
             response_mime_type="text/plain",
-            max_output_tokens=800,  # Increased token count for more substantial response
+            max_output_tokens=650,  # Increased token count for more substantial response
         )
         
         # Generate content (non-streaming for API response)
@@ -287,9 +287,9 @@ Keep your response between 1500 characters. Use academic but accessible language
         # Return the response text, truncating if necessary
         if response and hasattr(response, 'text'):
             summary = response.text.strip()
-            # Truncate to max 1500 characters
-            if len(summary) > 1500:
-                summary = summary[:1497] + "..."
+            # Truncate to max 1300 characters
+            if len(summary) > 1300:
+                summary = summary[:1297] + "..."
             return {"summary": summary}
         else:
             return {"summary": f"We couldn't generate a summary for '{search_query.query}' at this time. Please try again later."}
@@ -297,6 +297,68 @@ Keep your response between 1500 characters. Use academic but accessible language
     except Exception as e:
         logger.error(f"Error in get_gemini_summary: {e}")
         return {"summary": f"We couldn't generate a summary for '{search_query.query}' at this time. Please try again later.", "error": str(e)}
+
+@app.post("/deep-research")
+async def get_deep_research(request: dict):
+    try:
+        query = request.get("query", "")
+        context = request.get("context", "")
+        instructions = request.get("instructions", "")
+        
+        logger.info(f"Generating deep research analysis for: {query}")
+        
+        # Use the Client approach from google-genai
+        from google import genai
+        from google.genai import types
+        
+        # Create a client with the API key
+        client = genai.Client(
+            api_key=os.environ.get("GEMINI_API_KEY"),
+        )
+        
+        # Use gemini-2.0-flash model
+        model = "gemini-2.0-flash"
+        
+        # Create comprehensive prompt
+        prompt = f"""You are an expert AI research analyst. {instructions}
+
+Query: {query}
+
+Research Papers Context:
+{context}
+
+Please provide a comprehensive, well-structured analysis in markdown format with LaTeX mathematical notation where appropriate. The analysis should be detailed, authoritative, and demonstrate deep understanding of the research field."""
+        
+        contents = [
+            types.Content(
+                role="user",
+                parts=[types.Part.from_text(text=prompt)],
+            ),
+        ]
+        
+        # Set up the generation config for longer content
+        generate_content_config = types.GenerateContentConfig(
+            response_mime_type="text/plain",
+            max_output_tokens=10000,  # Increased for comprehensive analysis
+        )
+        
+        # Generate content
+        response = client.models.generate_content(
+            model=model,
+            contents=contents,
+            config=generate_content_config,
+        )
+        
+        if response and hasattr(response, 'text'):
+            analysis = response.text.strip()
+            return {"analysis": analysis}
+        else:
+            logger.error("No response from Gemini API")
+            return {"error": "Failed to generate analysis"}
+            
+    except Exception as e:
+        logger.error(f"Error in deep research analysis: {e}")
+        return {"error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn

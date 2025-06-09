@@ -1,18 +1,20 @@
 "use client";
 
-import { Button } from "@tremor/react";
 import { ShineCard } from "./ui/shine-card";
-import Link from "next/link";
-import ReactMarkdown from 'react-markdown';
+import LatexRenderer from "./LatexRenderer";
+import ShinyButton from "./ui/shiny-button";
+import { SearchResult } from "../lib/api";
 
 interface GeminiSummaryProps {
   summary: string;
   query: string;
   isLoading?: boolean;
   error?: string | null;
+  papers?: SearchResult[];
+  onDeepResearchClick?: () => void;
 }
 
-export default function GeminiSummary({ summary, query, isLoading = false, error = null }: GeminiSummaryProps) {
+export default function GeminiSummary({ summary, query, isLoading = false, error = null, papers = [], onDeepResearchClick }: GeminiSummaryProps) {
   // If summary contains "we couldn't generate", it's an error from the backend
   const hasError = error || summary.toLowerCase().includes("we couldn't generate");
   
@@ -30,14 +32,14 @@ export default function GeminiSummary({ summary, query, isLoading = false, error
       </h2>
       
       {isLoading ? (
-        <div className="flex flex-col space-y-2 animate-pulse flex-grow">
+        <div className="flex flex-col space-y-2 animate-pulse flex-1 min-h-0">
           <div className="h-4 bg-gray-700 rounded w-full"></div>
           <div className="h-4 bg-gray-700 rounded w-5/6"></div>
           <div className="h-4 bg-gray-700 rounded w-4/6"></div>
           <div className="h-4 bg-gray-700 rounded w-3/4"></div>
         </div>
       ) : hasError ? (
-        <div className="text-gray-300 mb-4 flex-grow">
+        <div className="text-gray-300 flex-1 min-h-0">
           <p className="text-amber-400 mb-2">
             Sorry, we couldn't generate a summary for this query.
           </p>
@@ -46,25 +48,16 @@ export default function GeminiSummary({ summary, query, isLoading = false, error
           </p>
         </div>
       ) : (
-        <div className="text-gray-300 mb-4 prose prose-invert prose-sm max-w-none flex-grow">
-          <ReactMarkdown>
-            {summary}
-          </ReactMarkdown>
+        <div className="text-gray-300 prose prose-invert prose-sm max-w-none flex-1 min-h-0 overflow-y-auto custom-scrollbar">
+          <LatexRenderer content={summary} />
         </div>
       )}
       
-      <div className="flex justify-end items-center mt-auto pt-3">
-        {!isLoading && !hasError && (
-          <Link href={`/research?q=${encodeURIComponent(query)}`}>
-            <Button
-              color="blue"
-              variant="secondary"
-              size="sm"
-              className="rounded-xl"
-            >
-              Deep Research
-            </Button>
-          </Link>
+      <div className="flex justify-end items-center pt-3 border-t border-gray-800 mt-3">
+        {!isLoading && !hasError && papers.length > 0 && (
+          <ShinyButton onClick={onDeepResearchClick}>
+            Deep Research
+          </ShinyButton>
         )}
       </div>
     </ShineCard>

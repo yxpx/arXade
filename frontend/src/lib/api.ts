@@ -21,7 +21,7 @@ export interface GeminiSummary {
   error?: string;
 }
 
-export const searchPapers = async (query: string, limit: number = 36): Promise<SearchResult[]> => {
+export const searchPapers = async (query: string, limit: number = 50): Promise<SearchResult[]> => {
   try {
     console.log(`Searching for: ${query} with limit: ${limit}`);
     const response = await fetch(`${API_URL}/search`, {
