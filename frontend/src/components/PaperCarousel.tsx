@@ -121,7 +121,7 @@ export default function PaperCarousel({ papers, title = "Relevant Papers" }: Pap
             {currentPapers.map((paper) => (
               <article 
                 key={getPaperKey(paper)} 
-                className="bg-gray-800 rounded-xl p-4 transition-all duration-200 hover:bg-gray-750 hover:shadow-xl border border-white/5 flex flex-col"
+                className="bg-gray-900/80 rounded-xl p-4 transition-all duration-200 hover:bg-gray-850/90 hover:shadow-xl border border-gray-700/30 flex flex-col backdrop-blur-sm shadow-lg shadow-black/30"
               >
                 <h3 className="text-lg font-semibold text-white mb-2 line-clamp-1">
                   <LatexRenderer content={paper.title} />
@@ -161,7 +161,7 @@ export default function PaperCarousel({ papers, title = "Relevant Papers" }: Pap
             ))}
           </div>
 
-          <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-800">
+          <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-700/50">
             <button
               onClick={goToPrevPage}
               className="flex items-center gap-1 text-gray-400 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
