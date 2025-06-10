@@ -162,7 +162,7 @@ export default function WordCloudChart({ width, height, words, title = "Common T
   return (
     <ShineCard className="w-full">
       <div className="text-white mb-4 text-xl font-semibold">{title}</div>
-      <div className="w-full h-[400px] flex items-center justify-center bg-gradient-to-br from-gray-900/50 to-gray-800/30 rounded-lg border border-gray-700/30">
+      <div className="w-full h-[400px] flex items-center justify-center bg-gradient-to-br from-gray-950/60 to-gray-900/40 rounded-lg border border-gray-700/30">
         {width && height ? (
           renderWordCloud(width, height)
         ) : (
