@@ -53,7 +53,7 @@ export default function GeminiSummary({ summary, query, isLoading = false, error
         </div>
       )}
       
-      <div className="flex justify-end items-center pt-3 border-t border-gray-800 mt-3">
+      <div className="flex justify-end items-center pt-3 border-t border-gray-700/50 mt-3">
         {!isLoading && !hasError && papers.length > 0 && (
           <ShinyButton onClick={onDeepResearchClick}>
             Deep Research
