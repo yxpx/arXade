@@ -22,7 +22,7 @@ export const ShineCard = React.forwardRef<HTMLDivElement, ShineCardProps>(
       <div
         ref={ref}
         className={cn(
-          "relative h-full overflow-hidden rounded-xl bg-gray-900 border border-white/10",
+          "relative h-full overflow-hidden rounded-xl bg-gray-950/90 backdrop-blur-sm border border-gray-700/40 shadow-2xl shadow-black/50",
           containerClassName
         )}
         style={{ borderWidth: `${borderWidth}px` }}
@@ -30,7 +30,7 @@ export const ShineCard = React.forwardRef<HTMLDivElement, ShineCardProps>(
       >
         <div
           className={cn(
-            "relative h-full rounded-xl p-5",
+            "relative h-full rounded-xl p-5 bg-gradient-to-br from-gray-900/20 to-transparent",
             className
           )}
         >
