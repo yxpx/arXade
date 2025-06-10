@@ -497,7 +497,7 @@ function ResultsContent() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-5 py-3 bg-transparent border border-gray-300 rounded-full focus:outline-none focus:shadow-[0_0_3px_rgba(255,255,255,0.1)] text-white"
+                className="w-full px-5 py-3 bg-black/60 backdrop-blur-md border border-gray-700 text-white focus:outline-none focus:border-gray-500 transition-all duration-300 placeholder-gray-400 rounded-full"
               />
               <button 
                 type="submit"
