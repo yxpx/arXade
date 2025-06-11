@@ -1,69 +1,75 @@
-# arXade - AI-Powered arXiv Paper Discovery
+# arXade
 
-arXade is a hackathon project that revolutionizes arXiv paper discovery by building an intelligent search engine that leverages vector embeddings and AI-powered tailored suggestions.
+AI-powered arXiv paper discovery using semantic search and intelligent summaries.
 
 ## Features
 
-- **Next.js Frontend**: Modern, responsive UI with Tailwind CSS
-- **Python FastAPI Backend**: RESTful API with MongoDB integration
-- **Gemini AI Integration**: Get intelligent summaries and insights
-- **Vector Search**: Find semantically similar papers
-- **Data Visualization**: Explore papers through intuitive charts and wordclouds
+**Intelligent Search**
+- Vector embeddings for semantic paper discovery
+- Search by concepts rather than keywords
+- Relevance scoring based on paper content
+
+**AI Summaries**
+- Gemini AI generates research summaries
+- Contextual recommendations for related work
+- Deep research analysis for paper collections
+
+**Data Visualization**
+- Word clouds from paper abstracts
+- Category distribution charts
+- Timeline views of research trends
+- Interactive filtering and exploration
+
+## Dataset
+
+This project uses the **arXiv CS Embeddings (Gemini-004-int8)** dataset:
+[https://www.kaggle.com/datasets/yxpx237/arxiv-cs-embeddings-gemini-004-int8](https://www.kaggle.com/datasets/yxpx237/arxiv-cs-embeddings-gemini-004-int8)
+
+## Tech Stack
+
+```
+Frontend     │ Next.js, TypeScript, Tailwind CSS
+Backend      │ FastAPI, MongoDB Atlas, Vector Search  
+AI           │ Google Gemini API
+Charts       │ Recharts, Visx, Tremor
+Deployment   │ Docker, Google Cloud Run
+```
+
+## Local Development
+
+```bash
+# Clone the repository
+git clone https://github.com/yxpx/arXade.git
+cd arXade
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your MongoDB URI, Gemini API key, etc.
+
+# Start both frontend and backend
+docker-compose up
+```
+
+This runs both services automatically:
+- Frontend at http://localhost:3000
+- Backend API at http://localhost:8000
+
+## Requirements
+
+- Docker and Docker Compose
+- MongoDB Atlas account
+- Google Gemini API key
 
 ## Project Structure
 
-- `/frontend` - Next.js 13+ App Router application
-- `/backend` - FastAPI application with MongoDB and Gemini API integrations
-- `.env` - Environment variables (add to .gitignore for production)
-
-## Setup
-
-### Prerequisites
-
-- Node.js 20+
-- Python 3.11+
-- MongoDB Atlas account
-- Gemini API key
-
-### Environment Variables
-
-Create a `.env` file in the root directory with:
-
 ```
-# MongoDB Configuration
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/arxade
-MONGODB_DB_NAME=arxade
-MONGODB_COLLECTION=papers
-
-# Gemini API Configuration
-GEMINI_API_KEY=your_gemini_api_key_here
-
-# Frontend Configuration
-NEXT_PUBLIC_API_URL=http://localhost:8000
+arXade/
+├── frontend/          # Next.js application
+├── backend/           # FastAPI server
+├── data/              # Sample datasets
+└── docker-compose.yml # Development environment
 ```
-
-### Running the Application
-
-#### Backend
-
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-#### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## Deployment
-
-This project is designed to be deployed on Google Cloud Run, with MongoDB Atlas as the vector database.
 
 ## License
 
-MIT
+MIT License - see [LICENSE](LICENSE) file for details.
