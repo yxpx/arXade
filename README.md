@@ -66,7 +66,7 @@ This runs both services automatically:
 arXade/
 ├── frontend/          # Next.js application
 ├── backend/           # FastAPI server
-├── data/              # Sample datasets
+├── data/              # Embedding generation scripts
 └── docker-compose.yml # Development environment
 ```
 
