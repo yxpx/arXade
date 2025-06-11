@@ -45,7 +45,9 @@ export default function PaperCarousel({ papers, title = "Relevant Papers" }: Pap
     try {
       return new Date(dateStr).toLocaleDateString();
     } catch (e) {
-      console.error('Error formatting date:', dateStr, e);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error formatting date:', dateStr, e);
+      }
       return dateStr; // Return the original string if parsing fails
     }
   };
