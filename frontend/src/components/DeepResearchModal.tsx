@@ -41,8 +41,22 @@ function ContentRenderer({ content }: { content: string }) {
 
   // Process inline markdown formatting within text
   const processInlineFormatting = (text: string) => {
+    // First, auto-wrap common mathematical expressions that Gemini might not format properly
+    let processedText = text
+      // Mathematical expressions with dots: n · k · I · d -> $n \cdot k \cdot I \cdot d$
+      .replace(/\b([a-zA-Z]+)(\s*·\s*[a-zA-Z]+)+/g, (match) => {
+        const formatted = match.replace(/\s*·\s*/g, ' \\cdot ');
+        return `$${formatted}$`;
+      })
+      // Big O notation: O(something) -> $O(something)$
+      .replace(/\bO\(([^)$]+)\)/g, '$O($1)$')
+      // Single mathematical variables in context: "*n* is the" -> "$n$ is the"
+      .replace(/\*([a-zA-Z])\*/g, '$$$1$$')
+      // Fix any double dollar signs created by overlapping replacements
+      .replace(/\$\$+/g, '$');
+
     // Handle **bold** text
-    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    const parts = processedText.split(/(\*\*[^*]+\*\*)/g);
     
     return parts.map((part, i) => {
       if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
@@ -316,11 +330,18 @@ Emphasize mathematical rigor throughout. Include specific mathematical formulati
 ${papersContext}`
       };
 
+      // Validate API key
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+      if (!apiKey) {
+        throw new Error('API key not configured. Check NEXT_PUBLIC_API_KEY environment variable.');
+      }
+      
       // Call the backend API for deep research
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/deep-research`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-API-Key': apiKey,
         },
         body: JSON.stringify(prompt),
       });
