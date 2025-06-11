@@ -69,7 +69,6 @@ function ResultsContent() {
     try {
       // Fetch data from backend
       const papers = await searchPapers(query);
-      console.log("Search results received:", papers);
       
       if (papers && papers.length > 0) {
         setResults(papers);
@@ -78,7 +77,6 @@ function ResultsContent() {
         setSummaryLoading(true);
         try {
           const summaryData = await getGeminiSummary(query);
-          console.log("Summary received:", summaryData);
           setSummary(summaryData.summary);
           
           // Check if summary contains error message
@@ -117,11 +115,10 @@ function ResultsContent() {
   // Generate data for pie chart - group by primary category
   const getCategoryData = () => {
     if (!results || !results.length) {
-      console.log("No results available for categories");
       return [];
     }
     
-    // Define our priority categories - using both lowercase and uppercase versions
+    // Define our priority categories
     const priorityCategories = [
       "cs.CV", "cs.cv", 
       "cs.LG", "cs.lg", 
@@ -132,7 +129,7 @@ function ResultsContent() {
     ];
     const categoryCount: Record<string, number> = {};
     
-    // Define our standard categories - using the exact case as they appear in arXiv
+    // Define our standard categories
     const standardCategories = ["cs.CV", "cs.LG", "cs.CL", "cs.AI", "cs.NE", "cs.RO"];
     
     // Initialize all categories with zero count
@@ -140,16 +137,7 @@ function ResultsContent() {
       categoryCount[cat] = 0;
     });
     
-    console.log("Processing categories for", results.length, "papers");
-    
-    // For debugging
-    if (results.length > 0) {
-      console.log("Sample paper categories:", results[0].categories);
-      console.log("Sample paper primary category:", results[0].primary_category);
-      console.log("Total papers retrieved:", results.length);
-    }
-    
-    // Count all papers in their respective categories - with a simpler approach
+    // Count all papers in their respective categories
     results.forEach(paper => {
       // Get all categories from the paper
       const paperCategories = [];
@@ -164,9 +152,6 @@ function ResultsContent() {
         paperCategories.push(paper.primary_category);
       }
       
-      // Debug information
-      console.log(`Paper ${paper.id || paper.arxiv_id} categories:`, paperCategories);
-      
       // Check if any of the paper's categories match our standard categories
       let matched = false;
       
@@ -175,7 +160,6 @@ function ResultsContent() {
         // Look for an exact match (case-sensitive)
         if (paperCategories.includes(standardCat)) {
           categoryCount[standardCat] += 1;
-          console.log(`Paper categorized as ${standardCat} (exact match)`);
           matched = true;
           break; // Only count in the first matching category
         }
@@ -193,51 +177,41 @@ function ResultsContent() {
           
           if (matchFound) {
             categoryCount[standardCat] += 1;
-            console.log(`Paper categorized as ${standardCat} (case-insensitive match)`);
             matched = true;
             break; // Only count in the first matching category
           }
         }
       }
       
-      // If still no match, check if any paper category starts with our standard categories
+      // If still no match, try prefix matching
       if (!matched) {
         for (const standardCat of standardCategories) {
-          const lowerStandardCat = standardCat.toLowerCase();
-          
-          // Check if any paper category starts with this standard category (case-insensitive)
           const matchFound = paperCategories.some(paperCat => 
-            paperCat.toLowerCase().startsWith(lowerStandardCat)
+            paperCat.toLowerCase().startsWith(standardCat.toLowerCase())
           );
           
           if (matchFound) {
             categoryCount[standardCat] += 1;
-            console.log(`Paper categorized as ${standardCat} (prefix match)`);
             matched = true;
-            break; // Only count in the first matching category
+            break;
           }
         }
       }
       
-      // If still not matched after all attempts, don't add to "other" - all papers should match
-      if (!matched) {
-        console.log(`WARNING: Paper ${paper.id || paper.arxiv_id} could not be categorized:`, paperCategories);
+      // Log unmatched papers in development only
+      if (!matched && process.env.NODE_ENV === 'development') {
+        console.warn(`Paper ${paper.id || paper.arxiv_id} could not be categorized:`, paperCategories);
       }
     });
     
-    // Log the final categorization results
-    console.log("Final category counts:", categoryCount);
-    console.log("Total papers counted:", Object.values(categoryCount).reduce((a, b) => a + b, 0));
-    console.log("Expected total:", results.length);
+    // Convert to chart data format
+    const result = Object.entries(categoryCount)
+      .filter(([_, count]) => count > 0)
+      .map(([category, count]) => ({
+        category,
+        count
+      }));
     
-    // Always return all 5 standard categories, even if count is 0
-    const result = standardCategories.map(category => ({
-      category,
-      count: categoryCount[category] || 0
-    }))
-    .sort((a, b) => b.count - a.count);
-    
-    console.log("Category data:", result);
     return result;
   };
 
@@ -441,7 +415,7 @@ function ResultsContent() {
       return false;
     });
     
-    console.log(`Found ${filtered.length} papers in category ${category}`);
+
     
     // Get the proper label for this category
     const categoryLabel = {
