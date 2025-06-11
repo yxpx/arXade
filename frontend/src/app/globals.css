@@ -43,52 +43,8 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --animate-aurora: aurora 8s ease-in-out infinite alternate;
-  @keyframes aurora {
-  0% {
-    background-position: 0% 50%;
-    filter: hue-rotate(0deg) saturate(1.2) brightness(1.1);
-  }
-  12.5% {
-    background-position: 25% 75%;
-    filter: hue-rotate(30deg) saturate(1.4) brightness(1.2);
-  }
-  25% {
-    background-position: 50% 100%;
-    filter: hue-rotate(60deg) saturate(1.1) brightness(1.0);
-  }
-  37.5% {
-    background-position: 75% 75%;
-    filter: hue-rotate(90deg) saturate(1.3) brightness(1.15);
-  }
-  50% {
-    background-position: 100% 50%;
-    filter: hue-rotate(120deg) saturate(1.5) brightness(1.1);
-  }
-  62.5% {
-    background-position: 75% 25%;
-    filter: hue-rotate(150deg) saturate(1.2) brightness(1.25);
-  }
-  75% {
-    background-position: 50% 0%;
-    filter: hue-rotate(180deg) saturate(1.0) brightness(1.0);
-  }
-  87.5% {
-    background-position: 25% 25%;
-    filter: hue-rotate(210deg) saturate(1.3) brightness(1.2);
-  }
-  100% {
-    background-position: 0% 50%;
-    filter: hue-rotate(240deg) saturate(1.2) brightness(1.1);
-  }
-  }
   --animate-shine: shine var(--duration) infinite linear;
-  @keyframes shine {
-  0% {
-    background-position: 0% 0%;}
-  50% {
-    background-position: 100% 100%;}
-  to {
-    background-position: 0% 0%;}}}
+}
 
 :root {
   --radius: 0.625rem;
@@ -169,12 +125,7 @@
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
-}
-
+/* Animation keyframes */
 @keyframes aurora {
   0% {
     background-position: 0% 50%;
@@ -214,11 +165,6 @@ body {
   }
 }
 
-.animate-aurora {
-  animation: aurora 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Add the shine animation as specified in the guide */
 @keyframes shine {
   0% {
     background-position: 0% 0%;
@@ -226,25 +172,33 @@ body {
   50% {
     background-position: 100% 100%;
   }
-  to {
+  100% {
     background-position: 0% 0%;
   }
+}
+
+/* Animation classes */
+.animate-aurora {
+  animation: aurora 8s ease-in-out infinite alternate;
 }
 
 .animate-shine {
   animation: shine var(--duration, 14s) infinite linear;
 }
 
-html, body {
-  background-color: #000;
-  color: #fff;
+/* Body styles */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
 }
 
+/* Utility styles */
 .glow-text-white {
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.7), 0 0 10px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
 }
 
-/* Fix for search input on mobile */
+/* Remove default search styling */
 input[type="search"]::-webkit-search-decoration,
 input[type="search"]::-webkit-search-cancel-button,
 input[type="search"]::-webkit-search-results-button,
@@ -252,44 +206,36 @@ input[type="search"]::-webkit-search-results-decoration {
   -webkit-appearance: none;
 }
 
-@keyframes shine {
-  to {
-    background-position: calc(var(--x) * 2) calc(var(--y) * 2);
-  }
-}
-
-/* Custom Scrollbar Styles - Sleek & Minimalist Dark Theme */
+/* Custom scrollbar styles */
 .custom-scrollbar {
-  /* Firefox */
   scrollbar-width: thin;
-  scrollbar-color: rgba(75, 85, 99, 0.8) transparent;
+  scrollbar-color: #4A5568 #1A202C;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
+  background: #1A202C;
+  border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.6), rgba(147, 51, 234, 0.6));
-  border-radius: 3px;
-  transition: all 0.2s ease;
+  background: #4A5568;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.8), rgba(147, 51, 234, 0.8));
-  width: 8px;
+  background: #718096;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(180deg, rgba(59, 130, 246, 1), rgba(147, 51, 234, 1));
+  background: #2D3748;
 }
 
 .custom-scrollbar::-webkit-scrollbar-corner {
-  background: transparent;
+  background: #1A202C;
 }
