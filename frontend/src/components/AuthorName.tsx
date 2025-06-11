@@ -94,12 +94,13 @@ export default function AuthorName({ name, className = "" }: AuthorNameProps) {
       
       setFormattedName(result);
     } catch (err) {
-      console.error('Error processing name:', err);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error processing name:', err);
+      }
       setFormattedName(name);
     }
   }, [name]);
 
-  // Use a debugging <span> to see the actual name being processed
   return (
     <span className={className} title={name}>
       {formattedName}
