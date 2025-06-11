@@ -79,5 +79,11 @@ var/
 /backend/.env*
 !/backend/.env.example
 
+# deployment scripts (contain sensitive project info)
+/backend/deploy-cloudrun.sh
+/backend/deploy-*.sh
+/frontend/deploy-cloudrun.sh
+/frontend/deploy-*.sh
+
 #cursor
 .cursorrules
