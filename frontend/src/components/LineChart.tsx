@@ -54,7 +54,6 @@ export default function LineChart({ data, title = "Papers by Year", onPointClick
               bottom: 20,
             }}
             onClick={handleYearClick}
-            aspect={2.5}
           >
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis 
