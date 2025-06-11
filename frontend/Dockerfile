@@ -4,9 +4,9 @@ FROM node:20-alpine AS base
 FROM base AS deps
 WORKDIR /app
 
-# Install dependencies
+# Install dependencies with legacy peer deps to handle React 19 conflicts
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Rebuild the source code only when needed
 FROM base AS builder
