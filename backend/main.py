@@ -449,12 +449,8 @@ async def get_gemini_summary(
             
             logger.info(f"Using {len(top_papers)} papers as context for summary")
         
-        # Import Gemini client
-        from google import genai
-        from google.genai import types
-        
-        # Initialize Gemini client
-        client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+        # Initialize Gemini client 
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
         
         # Craft comprehensive prompt for academic summary
         prompt = f"""You are an AI research assistant helping users understand academic topics.
@@ -475,26 +471,16 @@ Format your response as plain text with no markdown formatting:
 Write a complete summary that ends naturally without being cut off. Keep it concise but comprehensive. Use academic but accessible language.
 """
         
-        # Prepare content for Gemini API
-        contents = [
-            types.Content(
-                role="user",
-                parts=[types.Part.from_text(text=prompt)],
-            ),
-        ]
-        
-        # Configure generation parameters optimized for summaries
-        generate_content_config = types.GenerateContentConfig(
-            response_mime_type="text/plain",
-            max_output_tokens=800,  # Sufficient for 1-2 complete paragraphs
-            temperature=0.3,         # Lower temperature for more focused summaries
-        )
-        
-        # Generate summary using Gemini 2.0 Flash
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=contents,
-            config=generate_content_config,
+        # Generate summary using Gemini
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                max_output_tokens=800,
+                temperature=0.3,
+                top_p=0.95,
+                top_k=40,
+            )
         )
         
         # Process and return response
@@ -542,12 +528,8 @@ async def get_deep_research(
     logger.info(f"Deep research analysis request for: {query}")
     
     try:
-        # Import Gemini client
-        from google import genai
-        from google.genai import types
-        
-        # Initialize Gemini client
-        client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+        # Initialize Gemini client 
+        genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
         
         # Create comprehensive research prompt
         prompt = f"""You are an expert AI research analyst. {instructions}
@@ -601,26 +583,16 @@ Provide an extensive original analysis that goes beyond summarizing the papers. 
 
 Make this analysis substantial, original, and demonstrate deep expertise in the field. Use mathematical notation where appropriate and provide detailed technical explanations."""
         
-        # Prepare content for Gemini API
-        contents = [
-            types.Content(
-                role="user",
-                parts=[types.Part.from_text(text=prompt)],
-            ),
-        ]
-        
-        # Configure generation for comprehensive analysis
-        generate_content_config = types.GenerateContentConfig(
-            response_mime_type="text/plain",
-            max_output_tokens=20000,  # Large token limit for comprehensive analysis
-            temperature=0.4,          # Slightly higher for more creative insights
-        )
-        
-        # Generate deep research analysis
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=contents,
-            config=generate_content_config,
+        # Generate deep research analysis using Gemini
+        model = genai.GenerativeModel('gemini-2.0-flash')
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                max_output_tokens=20000,
+                temperature=0.4,
+                top_p=0.95,
+                top_k=40,
+            )
         )
         
         # Process and return response
