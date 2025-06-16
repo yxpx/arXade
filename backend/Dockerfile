@@ -55,11 +55,11 @@ USER app
 COPY --chown=app:app . .
 
 # Expose the port that Cloud Run expects
-EXPOSE 8000
+EXPOSE 8080
 
 # Health check for Cloud Run
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:8000/')" || exit 1
+    CMD python -c "import requests; import os; port = os.environ.get('PORT', '8080'); requests.get(f'http://localhost:{port}/')" || exit 1
 
 # Use exec form for better signal handling in containers
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+CMD uvicorn main:app --host 0.0.0.0 --port "$PORT" --workers 1
