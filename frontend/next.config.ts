@@ -9,9 +9,6 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['@tremor/react', '@visx/responsive', 'recharts']
   },
   
-  // Essential for proper static asset handling in containers
-  assetPrefix: process.env.NODE_ENV === 'production' ? '' : undefined,
-  
   // Improve performance
   compress: true,
   
@@ -32,6 +29,20 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
+  },
+
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_API_KEY: process.env.NEXT_PUBLIC_API_KEY,
+  },
+
+  webpack(config) {
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: ["@svgr/webpack"],
+    });
+
+    return config;
   },
 };
 
