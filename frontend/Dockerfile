@@ -1,50 +1,53 @@
-FROM node:20-alpine AS base
+# Use the official Next.js image as a build environment
+FROM node:18-alpine AS builder
 
-# Install dependencies only when needed
-FROM base AS deps
+# Set working directory
 WORKDIR /app
 
-# Install dependencies with legacy peer deps to handle React 19 conflicts
+# Install dependencies
 COPY package.json package-lock.json* ./
 RUN npm ci --legacy-peer-deps
 
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# Copy source code
 COPY . .
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
+# Set build-time args for env vars
+ARG NEXT_PUBLIC_API_KEY
+ENV NEXT_PUBLIC_API_KEY=${NEXT_PUBLIC_API_KEY}
+
+# Disable telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Build the Next.js app with standalone output
 RUN npm run build
 
-# Production image, copy all the files and run next
-FROM base AS runner
+# --- Production Stage ---
+FROM node:18-alpine AS runner
+
+# Set working directory
 WORKDIR /app
 
+# Set production environment
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Create a non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/public ./public
-
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Automatically leverage output traces to reduce image size
+# Copy the standalone output from the builder stage
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
+# Switch to the non-root user
 USER nextjs
 
-EXPOSE 3000
+# Expose the port Next.js will run on
+EXPOSE 8080
 
-ENV PORT 3000
+# Set the PORT environment variable
+ENV PORT 8080
 
+# Start the server
 CMD ["node", "server.js"] 
