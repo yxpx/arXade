@@ -10,10 +10,10 @@ Features:
 - Deep research analysis capabilities
 - Optimized for serverless deployment
 
-Author: arXade Team
 """
 
 from fastapi import FastAPI, HTTPException, Depends, Request, Header
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from pydantic import BaseModel, Field
@@ -132,19 +132,12 @@ app = FastAPI(
 # MIDDLEWARE CONFIGURATION FOR CLOUD RUN
 # ============================================================================
 
-# CORS middleware for frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure specific origins in production
+    allow_origins=["*"],  # Allow all origins
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["*"],
-)
-
-# Security middleware for Cloud Run
-app.add_middleware(
-    TrustedHostMiddleware,
-    allowed_hosts=["*"]  # Configure specific hosts in production
+    allow_methods=["*"],  # Allow all methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 # ============================================================================
@@ -532,63 +525,161 @@ async def get_deep_research(
         genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
         
         # Create comprehensive research prompt
-        prompt = f"""You are an expert AI research analyst. {instructions}
+        prompt = f"""You are a distinguished AI research scientist and professor with expertise across multiple domains. {instructions}
 
 Query: {query}
 
 Research Papers Context:
 {context}
 
-Please provide a comprehensive, well-structured analysis following this format:
+Generate an extensive, mathematically rigorous research analysis of at least 4000-5000 words. This should be a comprehensive academic report with detailed explanations, mathematical formulations, and deep technical insights.
 
-## Paper Summaries
-First, provide a concise summary of the key points, abstracts, and conclusions for each of the top 10 papers provided in the context. For each paper, include:
-- Main contribution/findings
-- Key methodology or approach
-- Important conclusions or implications
-- Notable technical details
+FORMATTING REQUIREMENTS:
+- Use academic language with proper mathematical notation
+- Use LaTeX extensively for mathematical expressions: $inline$ or $$block$$
+- Include formal definitions, theorems, and mathematical formulations
+- Provide quantitative analysis where possible
+- Write detailed explanations for each section (minimum 300-400 words per major section)
+- Include specific examples and case studies where relevant
 
-## Comprehensive Research Analysis
+COMPREHENSIVE ANALYSIS STRUCTURE:
 
-Provide an extensive original analysis that goes beyond summarizing the papers. This should be the largest section and include:
+# Deep Research Analysis: {query}
 
-### Theoretical Foundations
-- Explain the underlying theoretical principles and mathematical frameworks
-- Discuss how current work builds upon or challenges existing theories
-- Provide original insights into the conceptual landscape
+## Executive Summary (500-600 words)
+Provide a comprehensive overview including:
+- Key mathematical formulations and their significance
+- Major research breakthroughs and their quantitative impact
+- Current state of the field with performance metrics
+- Critical challenges and opportunities identified from the research papers
+- Summary of findings and novel insights from the analyzed papers
 
-### Technical Deep Dive
-- Analyze methodological innovations and their implications
-- Compare and contrast different approaches with technical detail
-- Identify patterns, trends, and gaps in current research methodologies
-- Discuss computational complexity, scalability, and practical considerations
+## Individual Paper Analysis (800-1000 words)
+For each of the top 10 papers in the context, provide detailed analysis:
+- **Paper Title and Authors**
+- **Core Mathematical Contributions**: Include specific equations, theorems, or algorithms
+- **Methodological Innovations**: Technical approaches with mathematical formulations
+- **Experimental Results**: Quantitative findings with statistical significance
+- **Theoretical Implications**: How this work advances the field mathematically
+- **Limitations and Future Work**: Critical assessment with mathematical constraints
 
-### Cross-Paper Synthesis
-- Draw connections between different research directions
-- Identify emerging themes and research trajectories
-- Discuss conflicting findings and potential reconciliations
-- Highlight synergies between different approaches
+## Mathematical Foundations & Theoretical Framework (1000-1200 words)
+
+### Core Mathematical Principles
+- Formal mathematical definitions with LaTeX notation: $f: X \\rightarrow Y$
+- Fundamental equations and their derivations
+- Complexity analysis using Big O notation: $O(n)$, $O(n^2)$, $O(n \\log n)$
+- Mathematical properties, invariances, and constraints
+- Information-theoretic measures and bounds: $H(X) = -\\sum p(x) \\log p(x)$
+
+### Advanced Mathematical Formulations
+Present essential mathematical models:
+- Loss functions: $\\mathcal{{L}}(\\theta) = \\frac{{1}}{{n}}\\sum_{{i=1}}^{{n}} \\ell(f(x_i; \\theta), y_i)$
+- Optimization objectives: $\\min_{{\\theta}} \\mathcal{{L}}(\\theta) + \\lambda R(\\theta)$
+- Gradient computations: $\\nabla_{{\\theta}} \\mathcal{{L}}(\\theta)$
+- Convergence criteria and theoretical bounds
+- Probabilistic formulations and Bayesian frameworks
+
+### Mathematical Properties and Theoretical Guarantees
+- Convergence analysis with mathematical proofs
+- Stability conditions and robustness guarantees
+- Approximation theory and error bounds
+- Computational complexity and scalability analysis
+
+## State-of-the-Art Methodologies & Technical Analysis (1200-1500 words)
+
+### Leading Algorithmic Approaches
+For each major methodology, provide:
+- Complete mathematical formulation of algorithms
+- Theoretical complexity analysis with formal bounds
+- Performance guarantees and convergence proofs
+- Comparative analysis with quantitative benchmarks
+- Implementation considerations and computational requirements
+
+### Advanced Optimization Techniques
+Detail mathematical optimization methods:
+- Gradient-based methods: $\\theta_{{t+1}} = \\theta_t - \\eta_t \\nabla \\mathcal{{L}}(\\theta_t)$
+- Second-order methods: Newton's method, quasi-Newton approaches
+- Adaptive learning rates: Adam, RMSprop with mathematical formulations
+- Regularization techniques: L1, L2, elastic net with mathematical analysis
+- Constrained optimization and Lagrangian methods
+
+### Architectural Innovations and Design Principles
+- Mathematical justification for architectural choices
+- Theoretical analysis of design decisions
+- Performance implications with quantitative analysis
+- Novel architectural patterns and their mathematical foundations
+
+### Interdisciplinary Connections
+- Mathematical tools borrowed from other fields
+- Novel theoretical frameworks and their applications
+- Cross-pollination of ideas with mathematical analysis
+- Unified mathematical perspectives across different approaches
+
+### Conflicting Findings and Reconciliation
+- Mathematical analysis of contradictory results
+- Theoretical explanations for performance differences
+- Unified frameworks that reconcile different approaches
+- Statistical analysis of experimental variations
+
+## Research Frontiers & Open Problems (800-1000 words)
+
+### Unsolved Mathematical Challenges
+- Theoretical problems with formal mathematical statements
+- Computational complexity barriers and NP-hard problems
+- Mathematical conjectures and open questions in the field
+- Fundamental limitations with rigorous mathematical analysis
+
+### Emerging Mathematical Frameworks
+- Novel mathematical models and their theoretical properties
+- Advanced mathematical tools being applied to the field
+- Theoretical extensions and mathematical generalizations
+- Rigorous analysis of cutting-edge approaches
 
 ### Future Research Directions
-- Propose novel research questions based on current limitations
-- Suggest potential methodological improvements
-- Identify promising interdisciplinary connections
-- Discuss real-world applications and implementation challenges
+- Promising theoretical avenues with mathematical foundations
+- Novel mathematical problems requiring innovative solutions
+- Potential breakthrough areas and their mathematical implications
+- Long-term research challenges with quantitative goals
 
-### Critical Assessment
-- Evaluate the strengths and limitations of current approaches
-- Discuss reproducibility and validation concerns
-- Assess the broader impact on the field
-- Provide balanced perspectives on controversial aspects
+## Industry Applications & Real-World Impact (800-1000 words)
 
-Make this analysis substantial, original, and demonstrate deep expertise in the field. Use mathematical notation where appropriate and provide detailed technical explanations."""
+### Practical Implementations
+- Real-world deployments with mathematical performance analysis
+- Industry adoption patterns and quantitative success metrics
+- Economic impact with mathematical modeling
+- Case studies with detailed mathematical analysis
+
+### Implementation Challenges and Solutions
+- Mathematical constraints in practical deployments
+- Computational requirements and scalability with mathematical analysis
+- Theoretical vs. practical performance gaps
+- Engineering solutions with mathematical foundations
+
+### Theoretical Limitations and Assumptions
+- Mathematical constraints and fundamental theoretical limits
+- Critical assumptions and their mathematical validity
+- Robustness analysis and generalization bounds
+- Statistical significance and reproducibility concerns
+
+### Methodological Concerns
+- Evaluation methodologies with mathematical rigor
+- Bias analysis and fairness considerations
+- Validation challenges and theoretical soundness
+- Reproducibility issues with statistical analysis
+
+---
+
+**Comprehensive Mathematical Analysis based on research papers**
+
+CRITICAL: Generate a detailed, comprehensive analysis of at least 4000-5000 words. Each section must be thoroughly developed with mathematical rigor, specific equations, detailed explanations, and quantitative insights. Include extensive mathematical formulations, theoretical analysis, and formal mathematical treatment throughout."""
         
         # Generate deep research analysis using Gemini
         model = genai.GenerativeModel('gemini-2.0-flash')
         response = model.generate_content(
             prompt,
             generation_config=genai.types.GenerationConfig(
-                max_output_tokens=20000,
+                max_output_tokens=32000,  # Increased for comprehensive analysis
                 temperature=0.4,
                 top_p=0.95,
                 top_k=40,
