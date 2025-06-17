@@ -22,7 +22,7 @@ AI-powered arXiv paper discovery using semantic search and intelligent summaries
 
 ## Demo
 
-Watch the demo video here: [YouTube Demo](https://www.youtube.com/watch?v=WsU3qzf0Iew)
+Watch the demo video here: [arXade demo](https://www.youtube.com/watch?v=WsU3qzf0Iew)
 
 ## Dataset
 
