@@ -532,7 +532,7 @@ Query: {query}
 Research Papers Context:
 {context}
 
-Generate an extensive, mathematically rigorous research analysis of at least 4000-5000 words. This should be a comprehensive academic report with detailed explanations, mathematical formulations, and deep technical insights.
+Generate an extensive, mathematically rigorous research analysis of at least 2500-3500 words. This should be a comprehensive academic report with detailed explanations, mathematical formulations, and deep technical insights.
 
 FORMATTING REQUIREMENTS:
 - Use academic language with proper mathematical notation
@@ -642,37 +642,11 @@ Detail mathematical optimization methods:
 - Potential breakthrough areas and their mathematical implications
 - Long-term research challenges with quantitative goals
 
-## Industry Applications & Real-World Impact (800-1000 words)
-
-### Practical Implementations
-- Real-world deployments with mathematical performance analysis
-- Industry adoption patterns and quantitative success metrics
-- Economic impact with mathematical modeling
-- Case studies with detailed mathematical analysis
-
-### Implementation Challenges and Solutions
-- Mathematical constraints in practical deployments
-- Computational requirements and scalability with mathematical analysis
-- Theoretical vs. practical performance gaps
-- Engineering solutions with mathematical foundations
-
-### Theoretical Limitations and Assumptions
-- Mathematical constraints and fundamental theoretical limits
-- Critical assumptions and their mathematical validity
-- Robustness analysis and generalization bounds
-- Statistical significance and reproducibility concerns
-
-### Methodological Concerns
-- Evaluation methodologies with mathematical rigor
-- Bias analysis and fairness considerations
-- Validation challenges and theoretical soundness
-- Reproducibility issues with statistical analysis
-
 ---
 
 **Comprehensive Mathematical Analysis based on research papers**
 
-CRITICAL: Generate a detailed, comprehensive analysis of at least 4000-5000 words. Each section must be thoroughly developed with mathematical rigor, specific equations, detailed explanations, and quantitative insights. Include extensive mathematical formulations, theoretical analysis, and formal mathematical treatment throughout."""
+CRITICAL: Generate a detailed, comprehensive analysis of at least 2500-3500 words. Each section must be thoroughly developed with mathematical rigor, specific equations, detailed explanations, and quantitative insights. Include extensive mathematical formulations, theoretical analysis, and formal mathematical treatment throughout."""
         
         # Generate deep research analysis using Gemini
         model = genai.GenerativeModel('gemini-2.0-flash')
