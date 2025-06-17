@@ -20,6 +20,10 @@ AI-powered arXiv paper discovery using semantic search and intelligent summaries
 - Timeline views of research trends
 - Interactive filtering and exploration
 
+## Demo
+
+Watch the demo video here: [YouTube Demo](https://www.youtube.com/watch?v=WsU3qzf0Iew)
+
 ## Dataset
 
 This project uses the **arXiv CS Embeddings (Gemini-004-int8)** dataset:
