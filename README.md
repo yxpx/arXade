@@ -2,6 +2,10 @@
 
 AI-powered arXiv paper discovery using semantic search and intelligent summaries.
 
+## Demo
+
+Watch the demo video here: [arXade demo](https://youtu.be/AK4wACphAqs)
+
 ## Features
 
 **Intelligent Search**
@@ -19,10 +23,6 @@ AI-powered arXiv paper discovery using semantic search and intelligent summaries
 - Category distribution charts
 - Timeline views of research trends
 - Interactive filtering and exploration
-
-## Demo
-
-Watch the demo video here: [arXade demo](https://youtu.be/AK4wACphAqs)
 
 ## Dataset
 
