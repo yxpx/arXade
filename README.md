@@ -6,6 +6,11 @@ AI-powered arXiv paper discovery using semantic search and intelligent summaries
 
 Watch the demo video here: [arXade demo](https://youtu.be/AK4wACphAqs)
 
+## Dataset
+
+This project uses the **arXiv CS Embeddings (Gemini-004-int8)** dataset:
+[https://www.kaggle.com/datasets/yxpx237/arxiv-cs-embeddings-gemini-004-int8](https://www.kaggle.com/datasets/yxpx237/arxiv-cs-embeddings-gemini-004-int8)
+
 ## Features
 
 **Intelligent Search**
@@ -23,11 +28,6 @@ Watch the demo video here: [arXade demo](https://youtu.be/AK4wACphAqs)
 - Category distribution charts
 - Timeline views of research trends
 - Interactive filtering and exploration
-
-## Dataset
-
-This project uses the **arXiv CS Embeddings (Gemini-004-int8)** dataset:
-[https://www.kaggle.com/datasets/yxpx237/arxiv-cs-embeddings-gemini-004-int8](https://www.kaggle.com/datasets/yxpx237/arxiv-cs-embeddings-gemini-004-int8)
 
 ## Tech Stack
 
